@@ -227,6 +227,17 @@ typedef struct mCentralDev
 
 GAPMultiRoleCentralDev_t* g_mlinkingList = NULL; // devices
 
+void multiAddSlaveConnList(uint8_t addrType, uint8_t * addr) 
+{
+    GAPMultiRoleCentralDev_t node;
+    osal_memset(&node, 0, sizeof(GAPMultiRoleCentralDev_t));
+    node.next = NULL;
+    node.addrType = addrType;
+    osal_memcpy(node,addr, addr, B_ADDR_LEN);
+    multiListInSertTail(MULTI_CONFIG_MASTER_LINKING_MODE, (void **)&g_mlinkingList, &node);
+    
+}
+
 void multiDelCurrentConnNode(void)
 {
     if (g_mlinkingList) {
@@ -238,10 +249,15 @@ void multiDelCurrentConnNode(void)
             g_mlinkingList = NULL;
         }
         else {
-            g_mlink
+            g_mlinkingList = node;
         }
     }
     
+}
+
+GAPMultiRoleCentralDev_t * multiGetSlaveConnList(void)
+{
+    return g_mlinkingList;
 }
 ```
 
@@ -251,6 +267,138 @@ void multiDelCurrentConnNode(void)
 
 
 
+```c
+/** 枚举 定义，作为函数参数进行条件执行 **/
+typedef enum
+{
+    ...
+    MULTI_CONFIG_MASTER_LINKING_MODE,
+    ...
+    
+}GAPMultiListMode_t;
+
+/** scanner 结构体链表 **/
+typedef struct multiScan
+{
+    ...
+    struct multiScan* next;
+}GAPMultiRolScanner_t;
+
+/** multiListCreat **/
+static void* multiListCreate(GAPMultiListMode_t mode)
+{
+    void* node = NULL;
+    switch(mode){
+            ...
+                case MULTI_CONFIG_MASTER_LINKING_MODE:
+            	{
+            		GAPMultiRoleCentralDev_t* tnode = (GAPMultiRoleCentralDev_t*)osal_mem_alloc(sizeof(GAPMultiRoleCentralDev_t));
+            		if(tnode) {
+                        osal_memset(tnode, 0, sizeof(sizeof(GAPMultiRoleCentralDev_t)));
+                        tnode->next = NULL;
+                    }
+            		node = (GAPMultiRoleCentralDev_t*)tnode;
+                 }
+            	 break;
+            ...
+    }
+    return node;
+}
+
+/** multiListFindTail **/
+static void* multiListFindTail(GAPMultiListMode_t mode, void** ppnode)
+{
+    void* node = NULL;
+    
+    switch(mode)
+    {
+            ...
+            case MULTI_CONFIG_MASTER_LINKING_MODE:
+            {
+                GAPMultiRoleCentralDev_t* entry = *(GAPMultiRoleCentralDev_t**)ppnode;
+                
+                while(entry) {
+                    if(entry->next == NULL)
+                        break;
+                    entry = entry->next;
+                }
+                
+                node = entry;
+            }
+            break;
+                
+            ...
+    }
+    
+}
+
+/** multiListInsertTail **/
+uint8_t multiListInsertTail(GAPMultiListMode_t mode, void** ppnode, void* vnode)
+{
+    volatile uint8_t ret =FALSE;
+
+    switch(mode) {
+            ...
+                
+            case MULTI_CONFIG_MASTER_LINKING_MODE:
+            {
+               GAPMultiRoleCentralDev_t** curr = (GAPMultiRoleCentralDev_t**)ppnode;
+                GAPMultiRoleCentralDev_t* new_node = multiListCreate(mode);
+                
+                if (new_node) {
+                    osal_memcpy(new_node, (GAPMultiRoleCentralDev_t*)vnode, sizeof(GAPMultiRoleCentralDev_t));
+                    GAPMultiRoleCentralDev_t* entry = multiListFindTail(mode, (void**)ppnode);
+                    if (entry == NULL){
+                        *curr = new_node;
+                    }
+                    else {
+                        entry->next = new_node;
+                    }
+                    
+                    ret = TRUE;
+                }
+            }
+            break;
+
+            ...
+                    
+    }
+}
+```
+
+
+
+
+
+```c
+/** multiListDelNode **/
+static void multiListDelNode(GAPMultiListMode_t mode, void** ppnode, void* pvalue)
+{
+    switch (mode) {
+            ...
+            case MULTI_CONFIG_SLAVE_DEV_MODE:
+            {
+                for(GAPMultiRoleCentralDev_t** curr = (GAPMultiRoleCentralDev_t**)ppnode; *curr)
+                {
+                    GAPMultiRoleCentralDev_t* entry = *curr;
+                    
+                    if(osal_memcmp(entry->addr, (uint8*)pvalue, B_ADDR_LEN) == TRUE) {
+                        *curr = entry->next;
+                        osal_mem_free(entry);
+                        break;
+                    }
+                    else
+                    {
+                        curr = &entry->next;
+                    }
+                }
+            }
+            break;
+            ...
+    }
+}
+
+```
 
 
 
@@ -258,6 +406,30 @@ void multiDelCurrentConnNode(void)
 
 
 
+```c
+static void* multiList_inside(GAPMultiListMode_t mode, void** ppnode, void* pvalue)
+{
+    void* node = NULL;
+    
+    switch(mode) {
+            ...
+            case MULTI_CONFIG_MASTER_LINKING_MODE:
+            {
+                GAPMultiRoleCentralDev_t* entry = *(GAPMuttiRoleCentralDev_t**)ppnode;
+                
+                while(entry) {
+                    if(osal_memcmp(entry->addr, (uint8_t *)pvalue, B_ADDR_LEN) == TRUE)
+                        break;
+                    
+                    entry = entry->next;
+                }
+                node = (GAPMultiRoleCentralDev_t*)entry;
+            }
+            break;
+            ...
+    }
+}
+```
 
 
 
