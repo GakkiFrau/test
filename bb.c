@@ -7,6 +7,11 @@ typedef struct {
 	int top;
 }SqList;
 
+typedef struct Link
+{
+	int data;
+	struct Link *next;
+}Link_s;
 int main()
 {
 	
