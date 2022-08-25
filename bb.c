@@ -16,5 +16,6 @@ int main()
 {
 	
 	printf("hello world\n");
+	printf("bobo");
 	return 0;
 }
