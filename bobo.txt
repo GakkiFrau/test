@@ -4,3 +4,8 @@ girl
 object:source!
 STM32 MCU
 MMU
+SEGGER RRT
+WDT
+TIMER
+GPIO
+UART
