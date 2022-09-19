@@ -9,3 +9,9 @@ WDT
 TIMER
 GPIO
 UART
+Bluetooth
+UUID
+NAME
+SCAN
+Advertise
+
