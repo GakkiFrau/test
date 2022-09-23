@@ -14,4 +14,9 @@ UUID
 NAME
 SCAN
 Advertise
-
+Service UUID
+Characterstic UUID
+name
+handler assign
+on_hvx
+gatt_write
