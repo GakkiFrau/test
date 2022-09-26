@@ -18,5 +18,6 @@ int main()
 	printf("hello world\n");
 	printf("bobo");
 	printf("ming dynasty");
+	printf("kk");
 	return 0;
 }
