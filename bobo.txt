@@ -2,7 +2,7 @@ good jobs    !
 boy
 girl
 object:source!
-STM32 MCU
+STM32 MCUhttps://github.com/GakkiFrau/test/blob/main/bobo.txt
 MMU
 SEGGER RRT
 WDT
@@ -23,3 +23,5 @@ gatt_write
 GAP
 conn_parm
 ble_nus_init()
+UUID 128
+base UUID
