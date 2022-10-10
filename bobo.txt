@@ -20,3 +20,6 @@ name
 handler assign
 on_hvx
 gatt_write
+GAP
+conn_parm
+ble_nus_init()
