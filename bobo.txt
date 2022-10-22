@@ -25,3 +25,4 @@ conn_parm
 ble_nus_init()
 UUID 128
 base UUID
+coco.cooc
